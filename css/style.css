@@ -1,0 +1,24 @@
+
+/*DISPLAY VIEW*/
+.user-view {
+  display: none;
+}
+
+
+/*USER*/
+[data-mobile-user="true"] .display-view {
+  display: none;
+}
+
+[data-mobile-user="true"] .user-view {
+  display: block;
+}
+
+
+
+
+/*AVATAR*/
+.avatar {
+  width: 100px;
+  height: 100px;
+}

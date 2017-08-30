@@ -1,4 +1,3 @@
-var WebSocketServer = require("ws").Server;
 var http = require("http");
 var express = require("express");
 
@@ -8,49 +7,51 @@ app.use(express.static(__dirname + "/"));
 
 //Set port. Will be set to 5000 on local and determined by remote host
 var port = process.env.PORT || 5000;
-
 var server = http.createServer(app);
 server.listen(port);
 
 console.log("http server listening on %d", port);
 
-var wss = new WebSocketServer({server: server});
+var io = require('socket.io')(server);
 console.log("websocket server was created");
 
 
 var connections = [];
+var users = [];
 
-wss.on('connection', function(ws){
-  connections.push(ws);
+io.sockets.on('connection', function(socket){
+  connections.push(socket);
 
   console.log('user connnected');
 
-  ws.on('message', function(m){
-
-    var message = JSON.parse(m);
-
-    if(message.type == 'register'){
-
-      console.log(message);
-
-      var time = new Date().toJSON();
-
-      connections.forEach(function(connection, index){
-        connection.send(time + ": Someone has logged on");
-        console.log("msg sent to client");
-      });
-    }
+  socket.on('loadAll', function(user){
+    //EMIT sends ONLY to the original sender
+    socket.emit('loadAll', users);
+    users.push(user);
+    socket.broadcast.emit('register', user);
   });
 
-  ws.on('close', function(){
-    connections.splice(connections.indexOf(ws), 1);
+  socket.on('updateColor', function(user){
 
-    var time = new Date().toJSON();
+      users.forEach(function(userOld, index){
+        if(userOld.id == user.id && userOld != user){
+          users[index] = user;
+        }
+      });
 
-    connections.forEach(function(connection, index){
-      connection.send(time + ": Someone has logged off.");
-      console.log("msg sent to client");
-    });
+      socket.broadcast.emit('updateColor', user);
+  });
+
+
+
+
+  socket.on('disconnect', function(){
+
+    //Broadcast SENDS TO EVERYONE connected
+    socket.broadcast.emit('logOff', users[connections.indexOf(socket)]);
+
+    users.splice(connections.indexOf(socket), 1);
+    connections.splice(connections.indexOf(socket), 1);
 
     console.log('user disconnected');
   });

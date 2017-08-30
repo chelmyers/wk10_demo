@@ -1,33 +1,48 @@
 window.onload = function() {
 
-  var host = location.origin.replace(/^http/, 'ws');
-  var ws = new WebSocket(host);
+  var socket = io.connect(location.origin.replace(/^http/, 'ws'));
+
+  var user = new User();
+
+  socket.on('connect', function(){
+
+    socket.emit('loadAll', user);
+
+  });
+
+  socket.on('loadAll', function(users){
+    console.log(users);
+
+    users.forEach(function(user, index){
+      generateAvatar(user);
+    });
+  });
+
+  socket.on('register', function(user){
+    generateAvatar(user);
+  });
+
+  socket.on('logOff', function(user){
+    var selector = '#id-' + user.id;
+    $(selector).remove();
+  });
+
+  socket.on('updateColor', function(user){
+    var selector = '#id-' + user.id;
+    $(selector).css('background', user.color);
+  });
 
 
-  ws.onopen = function() {
 
-    var register = {type: 'register'};
+  $(document).mouseup(function(){
+    if(user.mobile){
+      console.log('clicked');
 
-    ws.send(JSON.stringify(register));
-  }
+      user.color = user.generateColor();
+      $('body').css('background', user.color);
 
-  ws.onmessage = function(e){
-    console.log(e);
-    $('body').append('<p>'+ e.data +'</p>');
-  }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+      socket.emit('updateColor', user);
+    }
+  });
 
 }

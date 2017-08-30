@@ -2,13 +2,30 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Week 01 Demo</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Week 04 Demo</title>
+
+
+  <link rel="stylesheet" href="css/style.css">
 </head>
-<body>
 
-  <h1>Let's see who's online!</h1>
+<body data-mobile-user="false">
+
+  <div class="display-view">
+    <h1>Let's see who's online!</h1>
+  </div>
+
+  <div class="user-view">
+    <p>Your ID is: <span class="id"></span></p>
+  </div>
+
+  <!-- <div class="avatar" id="id-###" style="background: #3333;">
+    ####
+  </div> -->
+
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
-
+  <script src="/socket.io/socket.io.js"></script>
+  <script src="modules/user.js"></script>
   <script src="client.js"></script>
 </body>
 </html>
